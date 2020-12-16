@@ -9,16 +9,20 @@
     <body>
         <main>
             <nav class="navbar">
-                <ul class="navlist">
-                    <li class="nav-link"><a href="./index.html">Google Search</a></li>
-                    <li class="nav-link"><a href="./images.html">Image Search</a></li>
+                <ul class="navlist-a">
+                    <li class="nav-link"><a href="https://google.com" ><img src="googleimg.png"></a></li>
+                    <div class="right-nav">
+                        <li class="nav-link"><a href="./index.html">Google Search</a></li>
+                        <li class="nav-link"><a href="./images.html">Image Search</a></li>
+                    </div>
+                    
                 </ul>
             </nav>
             <header>
                 <h3>Advanced Search</h3>
             </header>
             <form class="advanced-form" action="https://google.com/search">
-                <div class="form-group">
+                <div class="form-group first">
                     <label for="Find">Find pages with...</label>
                     <input id="Find" type="hidden">
                 </div>
@@ -28,15 +32,15 @@
                 </div>
                 <div class="form-group">
                     <label for="exactphrase">this exact word or phrase</label>
-                    <input id="exactphrase" name="as_epq"type="text">
+                    <input id="exactphrase" name="as_epq" autofocus autocomplete="off" type="text">
                 </div>
                 <div class="form-group">
                     <label for="anywords">any of these words:</label>
-                    <input id="anywords" type="text" name="as_oq">
+                    <input id="anywords" type="text" autocomplete="off" name="as_oq">
                 </div>
                 <div class="form-group">
                     <label for="nowords">none of these words:</label>
-                    <input id="nowords" type="text" name="as_eq">
+                    <input id="nowords" type="text" autocomplete="off" name="as_eq">
                 </div>
                 <input type="submit" class="btn btn-primary btn-adv" value="Advanced Search">
                 
