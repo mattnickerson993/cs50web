@@ -6,6 +6,10 @@ from django.urls import reverse
 from django import forms
 
 
+class NameForm(forms.Form):
+    form_title = forms.CharField(label="Page Title", min_length=1, max_length=100, initial='Enter new page title')
+    form_content = forms.CharField(widget=forms.Textarea, label="Page Content", initial="Enter markdown content for new page")
+
 
 
 def index(request):
@@ -42,4 +46,39 @@ def search(request):
                 "search_item": search_item,
                 "entries": entries
             })
+
+def new_page(request):
+
+    if request.method == 'GET':
+        return render(request, "encyclopedia/new_page.html", {
+            "form": NameForm()
+        })
+    if request.method == 'POST':
+        form = NameForm(request.POST)
+        if form.is_valid():
+            form_title = form.cleaned_data["form_title"]
+            form_content = form.cleaned_data["form_content"]
+            
+            if util.get_entry(form_title):
+                return render(request, "encyclopedia/new_page.html", {
+                    "error": 'Error: this page already exists',
+                    "form" : form
+                })
+            else:
+                util.save_entry(form_title, form_content)
+                return HttpResponseRedirect(reverse("display_page", args=(form_title,)))
+
+def edit_content(request, title):
+    if request.method == 'GET' and util.get_entry(title):
+        content = util.get_entry(title)
+        return render(request, "encyclopedia/edit_content.html", {
+            "title": title,
+            "content": content
+        })
+        
+    if request.method == 'POST':
+        new_content = request.POST.__getitem__("content-area")
+        if new_content:
+            util.save_entry(title, new_content)
+            return HttpResponseRedirect(reverse("display_page", args=(title,)))
 

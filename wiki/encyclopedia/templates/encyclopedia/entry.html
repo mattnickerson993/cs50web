@@ -5,6 +5,11 @@
 {% endblock %}
 
 {% block body %}
+  
     <h1>{{title}}</h1>
-    {{contents}}
+    <p>{{contents}}</p>
+    <a href="{% url 'edit_content' title%}">Edit Content</a>
+    
+
+
 {% endblock %}
