@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django import forms
 import random
+from markdown2 import Markdown
 
 
 class NameForm(forms.Form):
@@ -19,9 +20,12 @@ def index(request):
     })
 
 def display_page(request, title):
+
     if util.get_entry(title):
+        markdowner = Markdown()
+        converted_content = markdowner.convert(util.get_entry(title))
         return render(request, "encyclopedia/entry.html", {
-            "contents" : util.get_entry(title),
+            "contents" : converted_content,
             "title" : title
         })
     else:
@@ -87,7 +91,10 @@ def random_page(request):
     entries = util.list_entries()
     num = random.randint(0, len(entries)-1)
     title = entries[num]
+    markdowner = Markdown()
+    converted_content = markdowner.convert(util.get_entry(title))
+
     return render(request, "encyclopedia/entry.html", {
-            "contents" : util.get_entry(title),
+            "contents" : converted_content,
             "title" : title
         })

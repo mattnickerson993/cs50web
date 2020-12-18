@@ -6,8 +6,8 @@
 
 {% block body %}
   
-    <h1>{{title}}</h1>
-    <p>{{contents}}</p>
+    <!-- <h1>{{title}}</h1> -->
+    <p>{{contents|safe}}</p>
     <a href="{% url 'edit_content' title%}">Edit Content</a>
     
 
