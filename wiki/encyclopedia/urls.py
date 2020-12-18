@@ -6,5 +6,6 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("<str:title>", views.display_page, name="display_page")
+    path("<str:title>", views.display_page, name="display_page"),
+    path("navbar/search", views.search, name="search")
 ]
