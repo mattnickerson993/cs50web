@@ -35,3 +35,21 @@ def get_entry(title):
         return f.read().decode("utf-8")
     except FileNotFoundError:
         return None
+
+
+def  mdto_html(string_to_test):
+    """
+    parses markdown content into html using regex.
+    Right now it sucks. only able to replace a hash with an h1
+    Works for #, bold, ul, and links.
+    """
+    pattern1 = re.compile(r'(#{1,6})\s*([^\n]+)')
+    string_to_test= pattern1.sub(r'<h1>\2</h1>', string_to_test)
+    pattern2 = re.compile(r'(\*\*|__)([-\w\s]+)(\*\*|__)')
+    string_to_test = pattern2.sub(r'<strong>\2</strong>', string_to_test)
+    pattern3 = re.compile(r'[*]{1}\s*([^\n]+)')
+    string_to_test = pattern3.sub(r'<li>\1</li>', string_to_test)
+    pattern4 = re.compile(r'\[([\w\s]+)\]\s*\(([\w/:._]+)\)')
+    subbed_urls = pattern4.sub(r'<a href="\2">\1</a>', string_to_test)
+
+    return subbed_urls

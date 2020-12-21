@@ -93,8 +93,9 @@ def random_page(request):
     title = entries[num]
     markdowner = Markdown()
     converted_content = markdowner.convert(util.get_entry(title))
+    converted_regex_content = util.mdto_html(util.get_entry(title))
 
     return render(request, "encyclopedia/entry.html", {
-            "contents" : converted_content,
+            "contents" : converted_regex_content,
             "title" : title
         })
