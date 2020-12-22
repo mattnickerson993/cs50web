@@ -42,6 +42,7 @@ def  mdto_html(string_to_test):
     parses markdown content into html using regex.
     Right now it sucks. only able to replace a hash with an h1
     Works for #, bold, ul, and links.
+    use this function for random page, kept entry page the same
     """
     pattern1 = re.compile(r'(#{1,6})\s*([^\n]+)')
     string_to_test= pattern1.sub(r'<h1>\2</h1>', string_to_test)
