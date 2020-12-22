@@ -1,0 +1,21 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {%for listing in listings %}
+        {% if listing.active %}
+        <h1>Listing: {{listing.title}}</h1>
+        <p>{{listing.description}}</p>
+        <p>${{listing.start_bid}}</p>
+        <div>
+            <h4>Details</h4>
+            <ul>
+                <li>Listed by: </li>
+                <li>Category: {{listing.category}}</li>
+            </ul>
+        </div>
+        <p>{{listing.active}}</p>
+        {%else%}
+            
+        {% endif %}
+    {% endfor %}
+{% endblock %}
