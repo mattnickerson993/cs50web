@@ -2,7 +2,7 @@
 
 {% block body %}
     <div class="container mt-4">
-        <form action="{% url 'create_listing'%}" method="post">
+        <form enctype="mulitpart/form-data" method="post">
             {% csrf_token %}
             <div class="form-group">
                 <label for="{{form.category.id_for_label}}">Category</label>
@@ -23,6 +23,11 @@
             <div class="form-group">
                 <label for="{{form.start_bid.id_for_label}}">Staring Bid:</label>
                 {{form.start_bid}}
+            </div>
+        
+            <div class="form-group">
+                <label for="{{form.image.id_for_label}}">Image:</label>
+                {{form.image}}
             </div>
             <!-- <div class="form-group">
                 <label for="{{form.date.id_for_label}}">Date and Time:</label>

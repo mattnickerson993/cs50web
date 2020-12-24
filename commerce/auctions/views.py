@@ -4,25 +4,52 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django import forms
+from django.forms import ModelForm
+from .models import *
 
 from .models import User, Listing
 
+# class NewListingForm(forms.Form):
+#     title = forms.CharField(label="Title", max_length=64, widget=forms.TextInput(attrs={'class':'form-control'}))
+#     description = forms.CharField(label="Description", max_length=255, widget=forms.Textarea(attrs={'class':'form-control'}))
+#     active = forms.BooleanField(required = True,)
+#     start_bid = forms.DecimalField(label="Starting Bid", max_digits=10, decimal_places=2)
+#     category = forms.CharField(label="Category", max_length=20, widget=forms.TextInput(attrs={'class':'form-control'}))
 
+#     # date = forms.DateTimeField(label="Date and Time")
+
+class ListingForm(forms.ModelForm):
+    class Meta:
+        model = Listing
+        fields = ['title', 'description', 'active', 'image', 'start_bid', 'category']
+        widgets = {
+            'title' : forms.TextInput(attrs={'class':'form-control'}),
+            'description' : forms.Textarea(attrs={'class':'form-control'}),
+            'category': forms.TextInput(attrs={'class':'form-control'})
+
+        }
+
+"""
 class NewListingForm(forms.Form):
     title = forms.CharField(label="Title", max_length=64, widget=forms.TextInput(attrs={'class':'form-control'}))
     description = forms.CharField(label="Description", max_length=255, widget=forms.Textarea(attrs={'class':'form-control'}))
     active = forms.BooleanField(required = True,)
     start_bid = forms.DecimalField(label="Starting Bid", max_digits=10, decimal_places=2)
     category = forms.CharField(label="Category", max_length=20, widget=forms.TextInput(attrs={'class':'form-control'}))
+    image = forms.ImageField()
     # date = forms.DateTimeField(label="Date and Time")
+"""
 
 
 
 
 def index(request):
     if request.method == "GET":
+        watcher = Watcher.objects.get(user=request.user)
+        
         return render(request, "auctions/index.html", {
-            "listings" : Listing.objects.all()
+            "listings" : Listing.objects.all(),
+             "watchlist_length": len(watcher.watchitems.all())
         })
 
 
@@ -78,21 +105,59 @@ def register(request):
         return render(request, "auctions/register.html")
 
 def create_listing(request):
+    
     if request.method == 'GET':
-        form = NewListingForm()
-        print(form)
+        form = ListingForm()
         return render(request, "auctions/create.html", {
             "form": form
         })
     if request.method == 'POST':
-        form = NewListingForm(request.POST)
+        form = ListingForm(request.POST, request.FILES )
         if form.is_valid():
-            title = form.cleaned_data["title"]
-            description = form.cleaned_data["description"]
-            category = form.cleaned_data["category"]
-            active = form.cleaned_data["active"]
-            start_bid = form.cleaned_data["start_bid"]
-            # date = form.cleaned_data["date"]
-            listing = Listing(title= title, description= description, category= category, active= active, start_bid= start_bid)
-            listing.save()
-            return render(request, "auctions/index.html")
+            form.save()
+            return HttpResponseRedirect(reverse('index'))
+
+def get_listing(request, listing_id):
+    watcher = Watcher.objects.get(user=request.user)
+    listing = Listing.objects.get(id=listing_id)
+    if request.method == 'GET':
+        
+        if not watcher.watchitems.filter(id= listing_id):
+
+            return render(request, "auctions/listing_info.html", {
+                "listing": listing,
+                "watchlist": True
+                
+            })
+        else:
+            return render(request, "auctions/listing_info.html", {
+                "listing": listing,
+                "watchlist": False
+                
+            })
+    if request.method == 'POST':
+        action = request.POST["action"]
+        if action == "add":
+            watcher.watchitems.add(listing)
+        elif action == "del":
+            watcher.watchitems.remove(listing)
+        return HttpResponseRedirect(reverse('get_listing', args=(listing_id,)))       
+
+def watchlist(request):
+    
+    if request.method == 'GET':
+        watcher = Watcher.objects.get(user=request.user)
+        
+        return render(request, "auctions/watchlist.html", { 
+            "watchlist" : watcher.watchitems.all()
+        })
+    
+    if request.method == 'POST':
+        watcher = Watcher.objects.get(user=request.user)
+        item_id = request.POST["delitem"]
+        selected = watcher.watchitems.get(id= item_id)
+        watcher.watchitems.remove(selected)
+
+        # watcher.watchitems.remove(id = item_id)
+
+        return HttpResponseRedirect(reverse('watchlist'))

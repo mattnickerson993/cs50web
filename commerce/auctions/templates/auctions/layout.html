@@ -25,6 +25,15 @@
                     <a class="nav-link" href="{% url 'create_listing' %}">Create Listing</a>
                 </li>
                 <li class="nav-item">
+                    <a href="{% url 'watchlist' %}" class="nav-link">WatchList
+                    {% if watchlist_length %}
+                        <button type="button" class="btn btn-sm btn-secondary">{{watchlist_length}}</button>
+                    {% else %}
+                    {% endif %}
+                    </a>
+                    
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
                 </li>
             {% else %}
