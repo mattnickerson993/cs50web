@@ -8,6 +8,8 @@ from django.forms import ModelForm
 from .models import *
 
 from .models import User, Listing
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 # class NewListingForm(forms.Form):
 #     title = forms.CharField(label="Title", max_length=64, widget=forms.TextInput(attrs={'class':'form-control'}))
@@ -24,8 +26,8 @@ class ListingForm(forms.ModelForm):
         fields = ['title', 'description', 'active', 'image', 'start_bid', 'category']
         widgets = {
             'title' : forms.TextInput(attrs={'class':'form-control'}),
-            'description' : forms.Textarea(attrs={'class':'form-control'}),
-            'category': forms.TextInput(attrs={'class':'form-control'})
+            'description' : forms.Textarea(attrs={'class':'form-control'})
+            # 'category': forms.TextInput(attrs={'class':'form-control'})
 
         }
 
@@ -42,15 +44,27 @@ class NewListingForm(forms.Form):
 
 
 
-
 def index(request):
     if request.method == "GET":
-        watcher = Watcher.objects.get(user=request.user)
+        if request.user.is_authenticated:
+            if Watcher.objects.filter(user=request.user): 
+                watcher = Watcher.objects.get(user=request.user)
+                return render(request, "auctions/index.html", {
+                    "listings" : Listing.objects.all(),
+                    "watchlist_length": len(watcher.watchitems.all())
+                })
+            else:
+                return render(request, "auctions/index.html", {
+                    "listings" : Listing.objects.all(),
+                    "watchlist_length": 0
+                })
+
+        else:
+            print(request.user)
+            return render(request, "auctions/index.html")
         
-        return render(request, "auctions/index.html", {
-            "listings" : Listing.objects.all(),
-             "watchlist_length": len(watcher.watchitems.all())
-        })
+
+        
 
 
 def login_view(request):
@@ -104,6 +118,7 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+@login_required
 def create_listing(request):
     
     if request.method == 'GET':
@@ -112,27 +127,57 @@ def create_listing(request):
             "form": form
         })
     if request.method == 'POST':
-        form = ListingForm(request.POST, request.FILES )
+        new_listing = Listing(user = request.user)
+        form = ListingForm(request.POST, request.FILES, instance=new_listing)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('index'))
 
+@login_required
 def get_listing(request, listing_id):
+    
+
+    #display close or bid button?
+    current_user = request.user
+    listing = Listing.objects.get(id=listing_id)
+    lister = listing.user
+    close = False
+    if lister == current_user:
+        close = True
+    # process the users watchlist
+    if not Watcher.objects.filter(user=request.user):
+        new_watcher= Watcher(user = request.user)
+        new_watcher.save()
+    
     watcher = Watcher.objects.get(user=request.user)
     listing = Listing.objects.get(id=listing_id)
+    status= None
+
+    #retrieve comments for display
+    comments = Comment.objects.filter(listing=listing)
+
+    #did the current user win this auction
+    if listing.active == False:
+        status = listing.winner
     if request.method == 'GET':
         
         if not watcher.watchitems.filter(id= listing_id):
 
             return render(request, "auctions/listing_info.html", {
                 "listing": listing,
-                "watchlist": True
+                "watchlist": True,
+                "close": close,
+                "status": status,
+                "comments": comments
                 
             })
         else:
             return render(request, "auctions/listing_info.html", {
                 "listing": listing,
-                "watchlist": False
+                "watchlist": False,
+                "close": close,
+                "status": status,
+                "comments": comments
                 
             })
     if request.method == 'POST':
@@ -141,16 +186,24 @@ def get_listing(request, listing_id):
             watcher.watchitems.add(listing)
         elif action == "del":
             watcher.watchitems.remove(listing)
-        return HttpResponseRedirect(reverse('get_listing', args=(listing_id,)))       
+        return HttpResponseRedirect(reverse('get_listing', args=(listing_id,)))
+    
 
+@login_required
 def watchlist(request):
     
     if request.method == 'GET':
-        watcher = Watcher.objects.get(user=request.user)
         
-        return render(request, "auctions/watchlist.html", { 
-            "watchlist" : watcher.watchitems.all()
-        })
+        if Watcher.objects.filter(user=request.user):
+            watcher = Watcher.objects.get(user=request.user)
+            return render(request, "auctions/watchlist.html", { 
+                "watchlist" : watcher.watchitems.all()
+            })
+        else:
+            return render(request, "auctions/watchlist.html", { 
+                "watchlist" : ""
+            })
+
     
     if request.method == 'POST':
         watcher = Watcher.objects.get(user=request.user)
@@ -161,3 +214,50 @@ def watchlist(request):
         # watcher.watchitems.remove(id = item_id)
 
         return HttpResponseRedirect(reverse('watchlist'))
+
+@login_required
+def makeBid(request, listing_id):
+    if request.method == 'POST':
+        bid_amt = float(request.POST["bid_amt"])
+        listing = Listing.objects.get(id=listing_id)
+        
+        if bid_amt > listing.start_bid and listing.user != request.user:
+            new_bid = Bid(user = request.user, amount = bid_amt)
+            new_bid.save()
+            listing.start_bid = bid_amt
+            listing.save()
+        elif bid_amt <= listing.start_bid:
+            messages.error(request, 'Bid must be greater than current high bid')
+
+        return HttpResponseRedirect(reverse('get_listing', args=(listing_id,)))
+
+@login_required
+def closeBid(request, listing_id):
+    if request.method == 'POST':
+        listing = Listing.objects.get(id=listing_id)
+        bidder = Bid.objects.get(amount=listing.start_bid)
+        messages.success(request, f'{listing} sold to {bidder.user} for {bidder.amount}')
+        #deactivate listing and label winner
+        listing.winner = bidder
+        listing.active = False
+        listing.save()
+
+        #remove item from watchlist if its in winners watchlist ( need to remove from all watchlists)
+        
+        if Watcher.objects.filter(user=bidder.user):
+            watcher= Watcher.objects.get(user=bidder.user)
+            selected = watcher.watchitems.get(id= listing_id)
+            watcher.watchitems.remove(selected)
+
+    
+        return HttpResponseRedirect(reverse('get_listing', args=(listing_id,)))
+
+@login_required
+def makeComment(request, listing_id):
+    if request.method == 'POST':
+        listing = Listing.objects.get(id=listing_id)
+        comment_content = request.POST["comment_content"]
+        comment = Comment(user=request.user, listing=listing, content=comment_content)
+        comment.save()
+        return HttpResponseRedirect(reverse('get_listing', args=(listing_id,)))
+
