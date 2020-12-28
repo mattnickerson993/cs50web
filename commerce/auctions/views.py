@@ -261,3 +261,20 @@ def makeComment(request, listing_id):
         comment.save()
         return HttpResponseRedirect(reverse('get_listing', args=(listing_id,)))
 
+@login_required
+def get_category(request):
+    if request.method == 'GET':
+        form = ListingForm()
+        return render(request, "auctions/categories.html", {
+            "form": form
+        })
+    
+    if request.method == 'POST':
+        form = ListingForm()
+        category = request.POST["category"]
+        categories = Listing.objects.filter(category=category)
+        print(categories)
+        return render(request, "auctions/categories.html", {
+            "form": form,
+            "categories": categories
+        })
