@@ -31,7 +31,7 @@ class Listing(models.Model):
     start_bid = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(max_length=20, choices=CATEGORIES, default="", null=True, blank=True)
     winner = models.ForeignKey(Bid, null=True, blank=True, on_delete=models.PROTECT)
-    image = models.ImageField( default='default.jpg', upload_to='images', blank = True)
+    image = models.ImageField(upload_to='images/', default ="default.jpg", blank = True)
     #need to do image url
 
     def __str__(self):

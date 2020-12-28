@@ -1,24 +1,28 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h1>Active Listings</h1>
-    {%for listing in listings %}
+    <div class="container d-flex flex-column justify-content-center align-items-center">
+        <h1 class="border-bottom border-primary">Active Listings</h1>
+        {%for listing in listings %}
         {% if listing.active %}
-        <h3>Listing: <a href="{% url 'get_listing' listing.id %}">{{listing.title}}</a></h3>
-        <p>{{listing.id}}</p>
-        <img class="img-thumbnail w-25" src="{{listing.image.url}}" alt="listing of image">
-        <p>{{listing.description}}</p>
-        <p>${{listing.start_bid}}</p>
-        <div>
-            <h4>Details</h4>
-            <ul>
-                <li>Listed by: </li>
-                <li>Category: {{listing.category}}</li>
-            </ul>
+        <div class="container d-flex flex-column justify-content-center align-items-center mb-4 border-info border-bottom">
+            <h3>Listing: <a href="{% url 'get_listing' listing.id %}">{{listing.title}}</a></h3>
+            <img class="img-thumbnail w-25" src="{{listing.image.url}}" alt="listing of image">
+            <p>{{listing.description}}</p>
+            <p>${{listing.start_bid}}</p>
+            <div>
+                <h4>Details</h4>
+                <ul>
+                    <li>Listed by: {{listing.user}}</li>
+                    <li>Category: {{listing.category}}</li>
+                </ul>
+            </div>
         </div>
-        <p>{{listing.active}}</p>
+        
         {%else%}
             
         {% endif %}
     {% endfor %}
+    </div>
+    
 {% endblock %}
