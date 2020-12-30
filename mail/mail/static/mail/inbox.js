@@ -23,16 +23,18 @@ function compose_email(status, id) {
   document.querySelector('#compose-subject').value = '';
   document.querySelector('#compose-body').value = '';
 
+  // propagate email content is replying to email
   if (status === 'reply'){
       fetch(`/emails/${id}`)
       .then(response => response.json())
       .then(email =>{
         document.querySelector('#compose-recipients').value = email.sender;
-        document.querySelector('#compose-subject').value = `Re: ${email.subject}`;
-        document.querySelector('#compose-body').value = `\n\n\nOn ${email.timestamp} ${email.sender} wrote 
+        document.querySelector('#compose-subject').value = `${email.subject.startsWith('Re:')? `${email.subject}`: `Re:${email.subject}`} `;
+        document.querySelector('#compose-body').value = `\n\n\n***On ${email.timestamp} ${email.sender} wrote 
         ${email.body}`;
       })
   }
+  // make post request to api via async postemail function
   const form = document.getElementById('compose-form')
   form.addEventListener('submit', postemail, {
     once: true
@@ -53,17 +55,33 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   emailsView.innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  // fetch and display contents in inbox,sent or archive
+
   fetch(`/emails/${mailbox}`)
   .then(response => response.json())
   .then(emails => emails.forEach(email => {
     const newDiv = document.createElement('div');
     newDiv.classList.add('email')
-    newDiv.innerHTML = `
+    if (mailbox === 'inbox' || mailbox === 'archive'){
+      newDiv.innerHTML = `
       <div>${email.sender}</div>
-      <div>${email.body}</div>
-      <div>${email.timestamp}</div>
+      <div>${email.body.slice(0,50)}</div>
+      <div class="text-secondary" >${email.timestamp}</div>
     `
+    }
+    // handle UI for multiple recipients
+    else if(mailbox === 'sent'){
+      recipients= `${email.recipients}`.split(",").join("<br>")
+      newDiv.innerHTML = `
+      <div >${recipients}</div>
+      <div>${email.body.slice(0,50)}</div>
+      <div class="text-secondary" >${email.timestamp}</div>
+    `
+    }
+  
     
+    // darken email div if read
     emailsView.appendChild(newDiv)
     if(email.read){
       newDiv.classList.add('emailback')
@@ -79,6 +97,8 @@ function load_mailbox(mailbox) {
         once:true
       }
     )
+    // clicking on email opens display view where user can reply/archive ect
+
     newDiv.addEventListener('click', () =>{
         
       fetch(`/emails/${email.id}`)
@@ -89,6 +109,9 @@ function load_mailbox(mailbox) {
         displayDiv = document.createElement('div')
         displayDiv.classList.add('display-div');
         displayDiv.innerHTML = '';
+        //  *** used parsing emails with multiple replies
+        parsedBody = data.body.split('***')
+        
         displayDiv.innerHTML = `
         <div class="email-content border-bottom border-primary">
         <div><strong>From:</strong> ${data.sender}</div>
@@ -100,9 +123,8 @@ function load_mailbox(mailbox) {
         </div>
         </div>
         <div class="email-body mt-2">
-        <div>${data.body}</div>
-        </div>
-        `;
+        <div>${parsedBody.map(piece => `<p>${piece}</p>`).join("")}</div>
+        </div>`;
         displayView.innerHTML="";
         displayView.appendChild(displayDiv)
         if (mailbox === 'archive'){
@@ -135,13 +157,13 @@ function load_mailbox(mailbox) {
             once: true
           })
         }
-
+        // sent mailbox does not provided archive functionality
         if (mailbox === 'sent'){
           btnToRemove = document.querySelector('.remove')
           btnToRemove.style.display = 'none'
         }
         
-        
+        // reply to email
         replybtn = document.getElementById('reply-btn')
         replybtn.addEventListener('click', () => 
           compose_email('reply', email.id),{
@@ -159,7 +181,7 @@ function load_mailbox(mailbox) {
   
 }
 
-
+// make post request to api and loads users mailbox
 async function postemail(event){
   event.preventDefault()
   const content = {

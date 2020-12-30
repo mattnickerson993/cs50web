@@ -5,6 +5,7 @@ textarea {
 .email{
     display: flex;
     justify-content: space-between;
+    align-items: center;
     border:1px solid black;
     padding:1em;
     margin-bottom: 1em;
@@ -12,13 +13,16 @@ textarea {
     transition: transform 250ms ease-in-out; 
 }
 
+.email div{
+    padding:1em;
+}
 .email:focus,
 .email:hover{
     transform: scale(1.1);
 }
 
 .emailback{
-    background-color: rgb(133, 133, 133);
+    background-color: #ccc;
 }
 
 .email-content{
