@@ -1,0 +1,15 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <h1>All Posts</h1>
+    <div class="container border border-secondary w-100 p-4">
+        <h3>New Post</h3>
+        <form action="{% url 'index' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                {{form.content}}
+            </div>
+            <input type="submit" class="btn btn-small btn-primary" value="Post">
+        </form>
+    </div>
+{% endblock %}
