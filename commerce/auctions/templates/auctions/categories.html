@@ -1,0 +1,42 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h3>Select To Display Category</h3>
+        <form method="POST" action = "{% url 'get_category' %}">
+            {% csrf_token%}
+            <div class="form-group">
+                {{form.category}}
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Display Category">
+            </div>
+
+        </form>
+
+    </div>
+    {% if categories %}
+        {% for category in categories %}
+        <div class="container d-flex flex-column justify-content-center align-items-center mb-4 border-info border-bottom">
+            <h3>Listing: <a href="{% url 'get_listing' category.id %}">{{category.title}}</a></h3>
+            <img class="img-thumbnail w-25" src="{{category.image.url}}" alt="listing of image">
+            <p>{{category.description}}</p>
+            <p>${{category.start_bid}}</p>
+            <div>
+                <h4>Details</h4>
+                <ul>
+                    <li>Listed by: {{category.user}}</li>
+                    <li>Category: {{category.category}}</li>
+                </ul>
+            </div>
+        </div>
+
+        {% endfor %}
+    {% else %}
+    <div class="container d-flex flex-column justify-content-center align-items-center mb-4 border-info border-bottom">
+        <h3>There are no current listings for this category</h3>
+    </div>
+        
+    {% endif %}
+       
+{% endblock %}

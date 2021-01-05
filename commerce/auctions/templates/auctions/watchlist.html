@@ -1,0 +1,31 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    
+    <div class="container ml-0 d-flex flex-column align-items-center justify-content-center">
+
+        <h3>WatchList for {{request.user}}</h3>
+        {%for item in watchlist%}
+        <h3>Listing: <a href="{% url 'get_listing' item.id %}">{{item.title}}</a></h3>
+        <img class="img-thumbnail w-50" src="{{item.image.url}}" alt="listing_image">
+        <p>{{item.description}}</p>
+        <form action="{% url 'watchlist' %}" method="post">
+            {% csrf_token %}
+            <button name="delitem" value="{{item.id}}" type="submit" class="btn btn-danger">Remove from WatchList</button>
+        </form>
+        <div class="mt-5">
+            <h4>Details</h4>
+            <ul>
+                <li>Listed by: {{item.user}}</li>
+                {% if item.category %}
+                <li>Category: {{item.category}}</li>
+                {% else %}
+                <li>Category: No Category Listed</li>
+                {% endif %}
+            </ul>
+        </div>
+        {% empty %}
+        <h3>Your watchlist currently has no items</h3>
+        {% endfor %}
+    </div>
+{% endblock %}
