@@ -1,15 +1,27 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
 from django.contrib.auth.decorators import login_required
-from .models import User, Post
+from django.views.decorators.csrf import csrf_exempt
+from .models import User, Post, Follower
 from .forms import PostForm
+from django.db.models import Q
+from functools import reduce
+import json
 
+from django.core.paginator import Paginator
 
 def index(request):
+
+    #handle pagination for all posts
+    posts  = Post.objects.order_by('-date_created')
+
+    paginator = Paginator(posts, 4) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     if request.method == "POST":
         newPost = Post(user = request.user)
@@ -19,7 +31,9 @@ def index(request):
             return HttpResponseRedirect(reverse('index'))
 
     return render(request, "network/index.html", {
-        "form": PostForm()
+        "form": PostForm(),
+        "posts": posts,
+        'page_obj': page_obj
     })
 
 
@@ -75,5 +89,179 @@ def register(request):
         return render(request, "network/register.html")
 
 
+def profile(request, username):
+
+    #deals with follow button--- ie you cant follow yourself
+    if username == str(request.user):
+        usernamefollow = True
+    else:
+        usernamefollow = False
+
+    #set initial display of follow btn to true
+    displayfollowbtn= True
+    
+    
+    # get the user object for username in url
+    usersought= User.objects.get(username = username)
+    print(usersought)
+
+    #get all of this users posts and sort by date created
+    posts = Post.objects.filter(user= usersought.id).order_by("-date_created")
+
+
+    # handle pagination for users posts
+
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    #count post and display number on page
+    postCount = Post.objects.filter(user= usersought.id).count()
 
     
+    
+    
+
+    if request.method == "POST":
+
+        
+        
+        # handles a post request for the logged in user to follow a user who's page is displayed
+        if request.POST["action"] == 'follow':
+            usertoFollow = User.objects.get(username=username) 
+            userthatwillfollow = request.user
+            if not Follower.objects.filter(user=userthatwillfollow):
+                newFollower = Follower(user= userthatwillfollow)
+                newFollower.save()
+                newFollower.following.add(usertoFollow)
+                
+            else:
+                currentFollower = Follower.objects.get(user=userthatwillfollow)
+                currentFollower.following.add(usertoFollow)
+                currentFollower.save()
+        
+        # handle an unfollow request
+
+        elif request.POST["action"] == 'unfollow':
+            userToUnFollow = User.objects.get(username=username) 
+            userThatWillUnfollow = request.user
+                
+            currentUnFollower = Follower.objects.get(user=userThatWillUnfollow)
+            currentUnFollower.following.remove(userToUnFollow)
+            currentUnFollower.save()
+
+        # count number of users the user (who's page is displayed is following)
+        followercount = Follower.objects.get(user=usersought)
+        following = followercount.following.count()
+
+        #count number of followers this user has 
+        count = usersought.users_followers.all()
+
+        
+        # handle display of follow vs unfollow btn
+        follower = Follower.objects.get(user = request.user)
+        if follower.following.filter(username = username):
+            displayfollowbtn = False
+
+        return render(request, "network/profile.html", {
+            "posts": posts,
+            "postCount": postCount,
+            "usernamefollow": usernamefollow,
+            "username": username,
+            "followers": len(count),
+            "following": following,
+            "displayfollowbtn": displayfollowbtn,
+            "page_obj": page_obj
+        })
+
+    else:
+        #handle scenario where user has not been a follower and needs to be created
+        
+        if not Follower.objects.filter(user=request.user):
+            initFollower = Follower(user= request.user)
+            initFollower.save()
+
+        if not Follower.objects.filter(user=usersought):
+            initFollower = Follower(user= usersought)
+            initFollower.save()
+
+        
+        # count number of users this user is following
+        followercount = Follower.objects.get(user=usersought)
+        following = followercount.following.count()
+
+        # count number of followers this user has
+        count = usersought.users_followers.all()
+
+        # handle display of follow vs unfollow btn
+        follower = Follower.objects.get(user = request.user)
+        if follower.following.filter(username = username):
+            displayfollowbtn = False
+        
+        
+
+        return render(request, "network/profile.html", {
+            "posts": posts,
+            "postCount": postCount,
+            "usernamefollow": usernamefollow,
+            "username": username,
+            "followers": len(count),
+            "following": following,
+            "displayfollowbtn": displayfollowbtn,
+            "page_obj": page_obj
+
+        })
+
+@login_required
+def displayfollowing(request):
+
+    if request.method == "GET":
+        follower = Follower.objects.get(user = request.user)
+        usersfollowed = follower.following.all()
+        
+                
+        if usersfollowed:  
+            posts = Post.objects.filter(reduce(lambda x,y : x | y, [Q(user=usr) for usr in usersfollowed])).order_by('-date_created')
+            
+        else:
+            posts= ""
+
+        # handle pagination of posts
+        paginator = Paginator(posts, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+    
+        return render(request, "network/following.html", {
+            "posts": posts,
+            "page_obj": page_obj
+        })
+
+def edit_post(request, post_id):
+    
+    try: 
+        post = Post.objects.get(user=request.user, pk=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": "Post not found."}, status=404)
+    
+    if request.method == "GET":
+        return JsonResponse(post.serialize())
+
+@csrf_exempt
+@login_required
+def save_edited_post(request, post_id):
+
+    try: 
+        post = Post.objects.get(user=request.user, pk=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": "Post not found."}, status=404)
+    
+    if request.method =="PUT":
+        data = json.loads(request.body)
+        if data.get("content") is not None:
+            post.content = data["content"]
+        post.save()
+        return HttpResponse(status=204)
+    else:
+        return JsonResponse({
+            "error": "PUT request required"
+        }, status=400)

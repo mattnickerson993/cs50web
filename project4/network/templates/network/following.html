@@ -1,0 +1,41 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <h1>Following</h1>
+    {% if posts%}
+    <div class="container mt-4 w-100">
+        {%for post in page_obj%}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><a class="stretched-link" href="{% url 'profile' post.user %}">{{post.user}}</a></h5>
+                    <p class="card-text">{{post.content}}</p>
+                    <a href="#" class="">❤️</a>
+                </div>
+                <div class="card-footer text-muted">
+                    {{post.date_created}}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <h4>You are not following an users at this time</h4>
+    {% endif %}
+    <nav class="pagination" aria-label="Page navigation">
+        <ul class="step-links pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{page_obj.previous_page_number }}">previous</a></li>
+            {% endif %}
+        
+            <li class="current page-item disabled">
+                <a href="#" class="page-link" aria-disabled="true">Page {{page_obj.number}} of {{page_obj.paginator.num_pages}}.</a> 
+            </li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{page_obj.next_page_number}}">next</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{page_obj.paginator.num_pages}}">last &raquo;</a></li>
+            {% endif %}
+        </ul> 
+
+    </nav>
+{% endblock %}
