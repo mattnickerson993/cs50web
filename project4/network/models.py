@@ -9,6 +9,7 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete= models.CASCADE, related_name= "posts")
     content = models.TextField(blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
+    likers = models.ManyToManyField(User, blank=True, related_name="userslikes")
 
     def __str__(self):
         return f"Post created by {self.user} on {self.date_created}"
@@ -17,7 +18,8 @@ class Post(models.Model):
         return {
             "user": self.user.username,
             "content": self.content,
-            "date_created": self.date_created
+            "date_created": self.date_created,
+            "like_count": [user.username for user in self.likers.all()]
         }
         
 class Follower(models.Model):

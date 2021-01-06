@@ -3,15 +3,24 @@ document.addEventListener('DOMConentLoaded', function(){
 });
 
 editbtns = document.querySelectorAll('.btn-edit')
+likebtns = document.querySelectorAll('.likebtn')
+
 
 editbtns.forEach(btn => {
     btn.onclick = function() {
-        console.log(typeof this.dataset.id)
         editPost(this.dataset.id)
     }
         
 
 })
+
+likebtns.forEach(btn => {
+    btn.onclick = function(){
+        handleLike(this.dataset.id)
+    }
+})
+
+
 
 
 
@@ -33,6 +42,7 @@ async function editPost(post_id){
         </div>
     </div>
     `
+    
     document.body.appendChild(newDiv)
 
     savebtn = document.getElementById('save')
@@ -49,8 +59,11 @@ async function editPost(post_id){
         })
         .then(response => console.log(response))
         document.body.removeChild(newDiv)
+        document.querySelector(`#content${post_id}`).innerHTML = `${postContent.content}`
+
         
     })
+
 
     closebtn = document.getElementById('close')
     closebtn.addEventListener('click',() => {
@@ -58,4 +71,21 @@ async function editPost(post_id){
     })
 
     
+}
+
+async function handleLike(post_id){
+
+    let response = await fetch(`/posts/like/${post_id}`)
+    let json = await response.json()
+    let likeCount = json.like_count.length
+    console.log(json)
+    currentDisplayedLikes = parseInt(document.querySelector(`.likecounter${post_id}`).innerHTML)
+    if (likeCount > currentDisplayedLikes){
+        document.querySelector(`.like${post_id}`).innerHTML = `👎`
+    }
+    else{
+        document.querySelector(`.like${post_id}`).innerHTML= `👍`
+    }
+    document.querySelector(`.likecounter${post_id}`).innerHTML = likeCount
+   
 }

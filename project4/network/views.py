@@ -18,6 +18,9 @@ def index(request):
 
     #handle pagination for all posts
     posts  = Post.objects.order_by('-date_created')
+    likes =[post.likers.filter(username=request.user) for post in posts]
+    print(likes)
+
 
     paginator = Paginator(posts, 4) 
     page_number = request.GET.get('page')
@@ -33,7 +36,8 @@ def index(request):
     return render(request, "network/index.html", {
         "form": PostForm(),
         "posts": posts,
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'likes': likes
     })
 
 
@@ -265,3 +269,22 @@ def save_edited_post(request, post_id):
         return JsonResponse({
             "error": "PUT request required"
         }, status=400)
+
+@csrf_exempt
+@login_required
+def manage_like(request, post_id):
+
+    try: 
+        post = Post.objects.get(pk=post_id)
+        
+        if post.likers.filter(username=request.user):
+            post.likers.remove(request.user)
+        else:
+            post.likers.add(request.user)
+        post.save()
+
+    except Post.DoesNotExist:
+        return JsonResponse({"error": "Post not found."}, status=404)
+    
+    if request.method == "GET":
+        return JsonResponse(post.serialize())
