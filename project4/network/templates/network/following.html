@@ -1,4 +1,5 @@
 {% extends "network/layout.html" %}
+{% load static %}
 
 {% block body %}
     <h1>Following</h1>
@@ -7,9 +8,24 @@
         {%for post in page_obj%}
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title"><a class="stretched-link" href="{% url 'profile' post.user %}">{{post.user}}</a></h5>
-                    <p class="card-text">{{post.content}}</p>
-                    <a href="#" class="">❤️</a>
+                    <h5 class="card-title"><a class="card-link" href="{% url 'profile' post.user %}">{{post.user}}</a></h5>
+                    <p class="card-text" id="content{{post.id}}">{{post.content}}</p>
+                    <div class="actions">
+                        {% if post.user == request.user %}
+                        <button data-id ="{{post.id}}" class="mb-2 btn-edit btn btn-small btn-secondary">Edit</button>
+                        {% endif %}
+                        <div class="like-containter">
+                            {% if request.user in post.likers.all%}
+                            <button data-id="{{post.id}}" class="likebtn like{{post.id}} btn btn-small">👎</button>
+                            {% else %}
+                            <button data-id="{{post.id}}" class="likebtn like{{post.id}} btn btn-small">👍</button>
+                            {% endif %}
+                            <button type="button" disabled class="likecounter{{post.id}} btn btn-small btn-outline-info">{{post.likers.all.count}}</button>
+
+                        </div>
+                        
+                    </div>
+                    
                 </div>
                 <div class="card-footer text-muted">
                     {{post.date_created}}
@@ -38,4 +54,8 @@
         </ul> 
 
     </nav>
+    {% block script %}
+    <script src="{% static 'network/edit.js' %}"></script>
+    
+    {% endblock%}
 {% endblock %}
