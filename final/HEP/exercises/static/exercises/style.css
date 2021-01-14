@@ -1,0 +1,17 @@
+body{
+    background-color: aqua;
+}
+
+.profile-icon{
+    font-size: 4rem;
+}
+
+.profile-img{
+    height: 150px;
+    width: 150px;
+    object-fit: cover;
+}
+
+.update-profile{
+    display:none
+}

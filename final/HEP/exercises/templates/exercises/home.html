@@ -1,0 +1,32 @@
+{% extends "exercises/layout.html" %}
+
+
+{% block content %}
+    <div class="container mt-2">
+        <a class="btn btn-primary" href="{% url 'exercise_create' %}">Create New Exercise</a>
+    </div>
+    {% for exercise in exercises %}
+    <!-- <div class="card border-success mb-3" style="max-width: 18rem;">
+        <div class="card-header bg-transparent border-success"><span><img class="profile-img rounded-circle img-fluid" src="{{exercise.author.profile.pic.url}}"></span>By: {{exercise.author}}</div>
+        <div class="card-body text-success">
+        <h5 class="card-title">{{exercise.title}}</h5>
+        <p class="card-text">{{exercise.description}}</p>
+        </div>
+        <div class="card-footer bg-transparent border-success">{{exercise.date_posted|date:" F d, Y"}}</div>
+    </div> -->
+    <div class="card m-4" style="max-width: 18rem;">
+        <img class="card-img-top" src="{{exercise.image.url}}" alt="Card image cap">
+        <div class="card-body">
+          <h5 class="card-title"><a href="{% url 'exercise_detail' exercise.pk %}">{{exercise.title}}</a></h5>
+          <p class="card-text">{{exercise.description}}</p>
+          <p class="card-text"><small class="text-muted">{{exercise.date_posted|date:" F d, Y"}}</small></p>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <small class="align-self-center text-muted">{{exercise.author}}</small>
+            <img style="max-width: 50px; max-height: 50px;"class="profile-img rounded-circle img-fluid" src="{{exercise.author.profile.pic.url}}">
+        </div>
+      </div>
+
+    {% endfor %}
+
+{% endblock content %}

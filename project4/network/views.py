@@ -18,14 +18,15 @@ def index(request):
 
     #handle pagination for all posts
     posts  = Post.objects.order_by('-date_created')
+    #did not implement
     likes =[post.likers.filter(username=request.user) for post in posts]
-    print(likes)
 
-
+    #pagination
     paginator = Paginator(posts, 4) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    #create new post
     if request.method == "POST":
         newPost = Post(user = request.user)
         form = PostForm(request.POST, instance = newPost)
@@ -107,7 +108,6 @@ def profile(request, username):
     
     # get the user object for username in url
     usersought= User.objects.get(username = username)
-    print(usersought)
 
     #get all of this users posts and sort by date created
     posts = Post.objects.filter(user= usersought.id).order_by("-date_created")
@@ -120,7 +120,8 @@ def profile(request, username):
     page_obj = paginator.get_page(page_number)
 
     #count post and display number on page
-    postCount = Post.objects.filter(user= usersought.id).count()
+    
+    postCount = posts.count()
 
     
     
@@ -138,7 +139,6 @@ def profile(request, username):
                 newFollower = Follower(user= userthatwillfollow)
                 newFollower.save()
                 newFollower.following.add(usertoFollow)
-                
             else:
                 currentFollower = Follower.objects.get(user=userthatwillfollow)
                 currentFollower.following.add(usertoFollow)
@@ -219,6 +219,7 @@ def profile(request, username):
 @login_required
 def displayfollowing(request):
 
+    # display posts from only the users the current logged in user is following, in chronological order
     if request.method == "GET":
         follower = Follower.objects.get(user = request.user)
         usersfollowed = follower.following.all()
@@ -242,6 +243,7 @@ def displayfollowing(request):
 
 def edit_post(request, post_id):
     
+    # provided data on post client is attempting to edit
     try: 
         post = Post.objects.get(user=request.user, pk=post_id)
     except Post.DoesNotExist:
@@ -254,6 +256,7 @@ def edit_post(request, post_id):
 @login_required
 def save_edited_post(request, post_id):
 
+    # handle saving an edited post via PUT request from client
     try: 
         post = Post.objects.get(user=request.user, pk=post_id)
     except Post.DoesNotExist:
@@ -274,6 +277,7 @@ def save_edited_post(request, post_id):
 @login_required
 def manage_like(request, post_id):
 
+    #handle addition or negation of like via API call from client
     try: 
         post = Post.objects.get(pk=post_id)
         
@@ -286,5 +290,6 @@ def manage_like(request, post_id):
     except Post.DoesNotExist:
         return JsonResponse({"error": "Post not found."}, status=404)
     
+    # return to client
     if request.method == "GET":
         return JsonResponse(post.serialize())

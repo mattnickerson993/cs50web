@@ -14,6 +14,7 @@ class Post(models.Model):
     def __str__(self):
         return f"Post created by {self.user} on {self.date_created}"
 
+    # to return to client side
     def serialize(self):
         return {
             "user": self.user.username,
