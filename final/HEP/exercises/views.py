@@ -2,13 +2,16 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import Exercise
+from .models import Exercise, TrainingProgram, ExerciseStats
 from django.contrib import messages
 from .forms import RegisterNewUserForm, UserUpdateForm, ProfileUpdateForm
 import os
-from django.views.generic import ListView, DetailView, CreateView
-
-
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import JsonResponse
+import json
+from django.core.paginator import Paginator
+from django.contrib.messages.views import SuccessMessageMixin
 
 #Class based views
 
@@ -17,11 +20,12 @@ class ExerciseListView(ListView):
     template_name = "exercises/home.html"
     context_object_name ='exercises'
     ordering = ['-date_posted']
+    paginate_by = 6
 
-class ExerciseDetailView(DetailView):
+class ExerciseDetailView(LoginRequiredMixin, DetailView):
     model = Exercise
-    
-class ExerciseCreateView(CreateView):
+   
+class ExerciseCreateView(LoginRequiredMixin, CreateView):
     model = Exercise
     fields = ['title', 'description', 'image']
 
@@ -29,7 +33,69 @@ class ExerciseCreateView(CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
+class ExerciseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 # Create your views here.
+    model= Exercise
+    fields = ['title', 'description', 'image']
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+    
+    def test_func(self):
+        exercise = self.get_object()
+        if self.request.user == exercise.author:
+            return True
+        return False
+
+class ExerciseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    
+    model = Exercise
+    success_url = '/'
+
+    def test_func(self):
+        exercise = self.get_object()
+        if self.request.user == exercise.author:
+            return True
+        return False
+
+
+class ProgramCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = TrainingProgram
+    fields = ['title']
+    success_url= '/exercise/library'
+    success_message = "Training Program successfully created. Select Exercises below"
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+class ExerciseStatsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+
+    model=ExerciseStats
+    success_url= '/exercise/programs'
+    success_message = "Successfully removed from program"
+    def test_func(self):
+        exercise = self.get_object()
+        if self.request.user == exercise.exerciser:
+            return True
+        return False
+
+class ExerciseStatsUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+# Create your views here.
+    model= ExerciseStats
+    fields = ['sets', 'reps', 'notes', 'time']
+    success_url= '/exercise/programs'
+
+    def form_valid(self, form):
+        form.instance.exerciser = self.request.user
+        return super().form_valid(form)
+    
+    def test_func(self):
+        exercise = self.get_object()
+        if self.request.user == exercise.exerciser:
+            return True
+        return False
 
 def home(request):
     
@@ -76,3 +142,81 @@ def profile(request):
         "user_form": user_form,
         "profile_form": profile_form
     } )
+
+def library(request):
+    exercises = Exercise.objects.all()
+    p = Paginator(exercises, 6)
+    page_number = request.GET.get('page')
+    page_obj = p.get_page(page_number)
+    
+    return render(request, "exercises/library.html", {
+        "exercises": exercises,
+        "page_obj": page_obj
+    })
+
+
+def retrieve_exercise_library(request, exercise_name):
+
+    try:
+        exercises = Exercise.objects.filter(title__startswith=exercise_name)
+        print(exercises)
+    
+    except Exercise.DoesNotExist:
+        return JsonResponse({"error": "Exercise not found"}, status= 404)
+
+    if request.method == "GET":
+        exercises = exercises.order_by("-date_posted").all()
+        
+        return JsonResponse([exercise.serialize() for exercise in exercises], safe=False)
+
+def retrieve_programs(request):
+
+    try: 
+        programs = TrainingProgram.objects.filter(author = request.user)
+    
+    except TrainingProgram.DoesNotExist:
+        return JsonResponse({"error": "Training programs not found"}, status= 404)
+    
+    if request.method == "GET":
+        return JsonResponse([program.serialize() for program in programs], safe=False)
+
+def save_to_program(request, pk, exid):
+    try:
+        program = TrainingProgram.objects.get(id=pk)
+        added_exercise = Exercise.objects.get(id=exid)
+        print(program)
+        print(added_exercise)
+        if ExerciseStats.objects.filter(exercise=added_exercise, exerciser=request.user):
+            new_Ex= ExerciseStats.objects.get(exercise=added_exercise, exerciser=request.user)
+        else:
+            new_Ex= ExerciseStats(exercise=added_exercise, exerciser=request.user )
+            new_Ex.save()
+        program.contents.add(new_Ex)
+        program.save()
+        messages.info(request, f'Exercise successfully added to training program')
+
+    except TrainingProgram.DoesNotExist:
+        return JsonResponse({"error": "Training program not found"}, status= 404)
+
+    return JsonResponse({"message": "succesful"}, status=201)
+
+def display_program_exercises(request, pk):
+    try: 
+        program = TrainingProgram.objects.get(id = pk)
+        print(program)
+    
+    except TrainingProgram.DoesNotExist:
+        return JsonResponse({"error": "Training program not found"}, status= 404)
+    
+    if request.method == "GET":
+        return JsonResponse(program.serialize())
+
+
+def programs(request):
+    programs = TrainingProgram.objects.filter(author = request.user)
+    for program in programs:
+        for content in program.contents.all():
+            print (content.exercise)
+
+    return render(request, "exercises/programs.html", 
+    {'programs': programs} )

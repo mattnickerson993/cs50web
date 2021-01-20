@@ -1,4 +1,5 @@
 {% extends "exercises/layout.html" %}
+{% load static %}
 
 
 {% block content %}
@@ -9,12 +10,29 @@
           <h5 class="card-title">{{object.title}}</h5>
           <p class="card-text">{{object.description}}</p>
           <p class="card-text"><small class="text-muted">{{object.date_posted|date:" F d, Y"}}</small></p>
-          <p class="card-text"><button class="btn btn-small btn-outline-primary">Edit</button></p>
+          {% if user == object.author %}
+          <p class="card-text"><a href="{% url 'exercise_update' object.pk %}" class="btn btn-small btn-outline-primary">Edit</a></p>
+          <p class="card-text"><a href="{% url 'exercise_delete' object.pk %}" class="btn btn-small btn-outline-primary">Delete</a></p>
+          {% else %}
+          {% endif %}
+          <div class="dropdown">
+            <button class="add btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Add to Program
+            </button>
+            <div class="dropdown-menu" data-exercise="{{object.pk}}"aria-labelledby="dropdownMenuButton">
+            </div>
+          </div>
+          
         </div>
         <div class="card-footer d-flex justify-content-between">
             <small class="text-muted align-self-center">{{object.author}}</small>
             <img style="max-height: 50px; max-width: 50px;"class="profile-img rounded-circle img-fluid" src="{{object.author.profile.pic.url}}">
         </div>
       </div>
+      
+
+    {% block script%}
+    <script src="{% static 'exercises/add.js' %}"></script>
+    {% endblock %}
 
 {% endblock content %}

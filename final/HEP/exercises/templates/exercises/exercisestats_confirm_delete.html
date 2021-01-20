@@ -1,0 +1,29 @@
+{% extends "exercises/layout.html" %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+    <div class="container m-4">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form group">
+                <p>Are you sure you want to delete this exercise from your program?</p>
+            </div>
+            <div class="form-group">
+                <small>
+                    <button type="sumbit" class="btn btn-danger">Delete</button>
+                    <a href="{% url 'programs'  %}" class="btn btn-success">Don't Delete</a>
+                </small>
+
+            </div>
+        </form>
+        
+    </div>
+    
+    
+    
+    
+    
+
+{% endblock content %}
