@@ -1,4 +1,4 @@
-// change of plans
+
 
 programToggleButton = document.querySelector('.program-view')
 programToggleButton.onclick = function(){

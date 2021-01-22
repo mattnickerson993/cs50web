@@ -21,7 +21,8 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('exercises.urls'))
+    path('', include('exercises.urls')),
+    path('calendar/', include('mycalendar.urls'))
 ]
 
 if settings.DEBUG:

@@ -1,0 +1,51 @@
+
+
+{% extends "exercises/layout.html" %}
+{% load static %}
+{% block content %}
+  {% if programs %}
+  <div class="container text-center mb-4 mt-4">
+      <h2>Add a workout program to your google calendar below</h2>
+      <div class="list-group">
+          <button class="list-group-item btn btn-outline-primary mb-2 program-view">Select Program</button>
+      
+          {% for program in programs %}
+          <button data-id={{program.id}} class="exerciseToggler list-group-item btn btn-outline-primary mb-2 program-item hide">{{program}}</button>
+              
+          
+          {% endfor %}
+      </div>
+
+      <div class="form-group">
+          <label for="program-date">Select Date</label>
+          <input class="form-control" type="date" id="program-date" name="program-date">
+      </div>
+      <div class="form-group">
+        <label for="program-start">Select Start Time:</label>
+        <input class="form-control" type="time" id="program-start" name="program-start">
+      </div>
+      <div class="form-group">
+        <label for="program-end">Select End Time:</label>
+        <input class="form-control" type="time" id="program-end" name="program-end">
+      </div>
+          
+          
+      
+     
+  </div>
+  {% else %}
+  <div class="container">
+      <p>You currently have no programs</p>
+  </div>
+  {% endif %}
+
+  <button class="btn btn-sm btn-primary" id="testbtn">Add Selected Program to my Google Calendar</button>
+
+   
+    {% block script %}
+    <script src="{% static 'mycalendar/config.js' %}"></script>
+    <script src="{% static 'mycalendar/calendar.js' %}"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+   {% endblock %}
+
+{% endblock content %}
