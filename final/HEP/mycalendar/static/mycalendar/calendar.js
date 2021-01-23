@@ -16,12 +16,14 @@ const programEvent = {
   'location':"Charlottesville VA",
   'description':"",
   'start': {
-    'dateTime': '',
-    'timeZone': 'America/New_York'
+    'timeZone': '',
+    'dateTime': ''
+    
   },
   'end': {
-    'dateTime': '',
-    'timeZone': 'America/New_York'
+    'timeZone': '',
+    'dateTime': ''
+    
   }
 }
 
@@ -91,9 +93,12 @@ function handleInputs(){
   let start = document.getElementById('program-start')
   let date = document.getElementById('program-date')
   let end = document.getElementById('program-end')
+  let timezone = document.getElementById('timezone')
+  programEvent.start.timeZone = timezone.value
+  programEvent.end.timeZone = timezone.value
   
-  programEvent.start.dateTime = `${date.value}T${start.value}:00-05:00`
-  programEvent.end.dateTime = `${date.value}T${end.value}:00-05:00`
+  programEvent.start.dateTime = `${date.value}T${start.value}:00`
+  programEvent.end.dateTime = `${date.value}T${end.value}:00`
   
   
   
