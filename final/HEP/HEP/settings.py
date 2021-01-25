@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
+from django.contrib.messages import constants as messages
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -143,3 +144,13 @@ DEFAULT_FROM_EMAIL = 'HEP Team <noreply@HEPTeam.com>'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+MESSAGE_TAGS ={messages.DEBUG: 'debug',
+                messages.INFO: 'info',
+                messages.SUCCESS: 'success',
+                messages.WARNING: 'warning',
+                messages.ERROR: 'danger',
+}

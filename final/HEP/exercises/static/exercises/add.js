@@ -60,5 +60,15 @@ async function saveToProgram(exid, id){
         })
     }
     )
+    let newDiv = document.createElement('div');
+    newDiv.innerHTML = `
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Exercise successfully added to training program</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    `
+    document.querySelector('.mess-container').prepend(newDiv)
 
 }

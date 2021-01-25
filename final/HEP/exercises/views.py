@@ -67,17 +67,22 @@ class ExerciseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         return False
 
-class TrainingProgramDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class TrainingProgramDeleteView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
     
     model = TrainingProgram
     success_url = '/exercise/programs'
-    success_message = "Training Program successfully deleted."
+    success_message = "Training Program Successfully Deleted."
 
     def test_func(self):
         training_program = self.get_object()
         if self.request.user == training_program.author:
             return True
         return False
+    
+    def delete(self, request, *args, **kwargs):
+        messages.info(self.request, self.success_message)
+        return super(TrainingProgramDeleteView, self).delete(request, *args, **kwargs)
+
 
 
 class ProgramCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -100,6 +105,10 @@ class ExerciseStatsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVie
         if self.request.user == exercise.exerciser:
             return True
         return False
+    
+    def delete(self, request, *args, **kwargs):
+        messages.error(self.request, self.success_message)
+        return super(ExerciseStatsDeleteView, self).delete(request, *args, **kwargs)
 
 class ExerciseStatsUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 # Create your views here.
@@ -208,16 +217,12 @@ def save_to_program(request, pk, exid):
     try:
         program = TrainingProgram.objects.get(id=pk)
         added_exercise = Exercise.objects.get(id=exid)
-        
-        # if ExerciseStats.objects.filter(exercise=added_exercise, exerciser=request.user):
-        #     new_Ex= ExerciseStats.objects.get(exercise=added_exercise, exerciser=request.user)
-        # else:
 
         new_Ex= ExerciseStats(exercise=added_exercise, exerciser=request.user )
         new_Ex.save()
         program.contents.add(new_Ex)
         program.save()
-        messages.info(request, f'Exercise successfully added to training program')
+        # messages.info(request, f'Exercise successfully added to training program')
 
     except TrainingProgram.DoesNotExist:
         return JsonResponse({"error": "Training program not found"}, status= 404)
