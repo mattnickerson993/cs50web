@@ -5,8 +5,12 @@
 
 {% block content %}
 
-    <div class="container m-4">
-        <a href="{% url 'create_program' %}"class="btn btn-primary">Create</a>
+    <div class="container m-4 d-flex justify-content-between">
+        <a href="{% url 'create_program' %}"class="btn btn-primary">Create A Program</a>
+        {% if programs %}
+        <a href="{% url 'training_programs_list' %}"class="btn btn-danger">Delete A Program</a>
+        {% else %}
+        {% endif %}
     </div>
     {% if programs %}
     <div class="container text-center">
@@ -15,9 +19,9 @@
         
             {% for program in programs %}
             <button data-id={{program.id}} class="exerciseToggler list-group-item btn btn-outline-primary mb-2 program-item hide">{{program}}</button>
-                
+            {% for content in program.contents.all %}  
             <div class="exercises{{program.id}} m-4 list-item hide">
-                {% for content in program.contents.all %}
+                
                 <div class="list-group-item btn btn-outline-secondary d-flex justify-content-around">
                     <span>{{content.exercise}}</span>
                     <span>
@@ -25,8 +29,9 @@
                         <a class="ml-1 btn btn-danger" href="{% url 'exercisestats_delete' content.id %}"><i class="far fa-trash-alt"></i></a>
                     </span>
                 </div>
-                {% endfor %}
+                
             </div>
+            {% endfor %}
                 
             
             {% endfor %}

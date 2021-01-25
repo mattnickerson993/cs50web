@@ -21,46 +21,7 @@
       <li class="page-item"><button class="page-link" id="next">next</button></li>
     </ul>
   </nav>
-      <!-- {% for exercise in exercises %}
-    
-    <div class="card m-4" style="max-width: 18rem;">
-        <img class="card-img-top" src="{{exercise.image.url}}" alt="Card image cap">
-        <div class="card-body">
-          <h5 class="card-title"><a href="{% url 'exercise_detail' exercise.pk %}">{{exercise.title}}</a></h5>
-          <p class="card-text">{{exercise.description}}</p>
-          <p class="card-text"><small class="text-muted">{{exercise.date_posted|date:" F d, Y"}}</small></p>
-        </div>
-        <div class="card-footer d-flex justify-content-between">
-            <small class="align-self-center text-muted">{{exercise.author}}</small>
-            <img style="max-width: 50px; max-height: 50px;"class="profile-img rounded-circle img-fluid" src="{{exercise.author.profile.pic.url}}">
-        </div>
-      </div>
-
-    {% endfor %} -->
-    <!-- <nav class="pagination" aria-label="Page navigation">
-      <ul class="step-links pagination">
-          {% if page_obj.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
-          <li class="page-item"><a class="page-link" href="?page={{page_obj.previous_page_number }}">previous</a></li>
-          {% endif %}
-          {% for num in page_obj.paginator.page_range %}
-              {% if page_obj.number == num %}
-                  <li class="page-item active"><a class="page-link" href="?page={{num}}">{{num}}</a></li>
-              {% elif num > page_obj.number|add:'-3' and page_obj.number|add:'3' > num %}
-                  <li class="page-item"><a class="page-link" href="?page={{num}}">{{num}}</a></li>
-             
-
-              {% endif %}
-              
-
-          {% endfor %}
-
-          {% if page_obj.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{page_obj.next_page_number}}">next</a></li>
-          <li class="page-item"><a class="page-link" href="?page={{page_obj.paginator.num_pages}}">last &raquo;</a></li>
-          {% endif %}
-      </ul>
-    </nav>  -->
+     
     {% block script%}
     <script src="{% static 'exercises/library.js' %}"></script>
    {% endblock %}

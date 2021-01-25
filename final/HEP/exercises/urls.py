@@ -1,14 +1,16 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from .views import ExerciseStatsUpdateView, ExerciseStatsDeleteView, ExerciseListView, ExerciseDetailView, ExerciseCreateView, ExerciseUpdateView, ExerciseDeleteView, ProgramCreateView
+from .views import TrainingProgramDeleteView, TrainingProgramListView, ExerciseStatsUpdateView, ExerciseStatsDeleteView, ExerciseListView, ExerciseDetailView, ExerciseCreateView, ExerciseUpdateView, ExerciseDeleteView, ProgramCreateView
 
 urlpatterns = [
     path('', ExerciseListView.as_view(), name="exercises-home"),
+    path('exercise/training_programs', TrainingProgramListView.as_view(), name="training_programs_list"),
     path('exercise/<int:pk>/', ExerciseDetailView.as_view(), name="exercise_detail"),
     path('exercise/create', ExerciseCreateView.as_view(), name="exercise_create"),
     path('exercise/update/<int:pk>', ExerciseUpdateView.as_view(), name="exercise_update"),
     path('exercise/delete/<int:pk>', ExerciseDeleteView.as_view(), name="exercise_delete"),
+    path('exercise/trainingprogram/delete/<int:pk>', TrainingProgramDeleteView.as_view(), name="training_program_delete"),
     path('register/', views.register, name="register"),
     path('login/', auth_views.LoginView.as_view(template_name="exercises/login.html"), name="login"),
     path('logout/', auth_views.LogoutView.as_view(template_name="exercises/logout.html"), name="logout"),
@@ -26,7 +28,7 @@ urlpatterns = [
 
     #API ROUTES
     path('exercise/library/retrieve/<str:exercise_name>', views.retrieve_exercise_library, name="retrieve_exercise_library"),
-    path('exercise/add', views.retrieve_programs, name="retrieve_programs"),
+    path('exercise/add/<int:pk>', views.retrieve_programs, name="retrieve_programs"),
     path('exercise/add/save/<str:pk>/<str:exid>', views.save_to_program, name="save_to_program"),
     path('exercise/programs/retrieve/<str:pk>', views.display_program_exercises, name="display_program_exercises")
 ]

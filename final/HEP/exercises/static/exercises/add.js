@@ -1,3 +1,5 @@
+// handle CSRF token without default django form
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -18,14 +20,16 @@ const csrftoken = getCookie('csrftoken');
 
 const addBtn = document.querySelector('.add')
 
-addBtn.onclick = () => {
-    getPrograms()
+addBtn.onclick = (e) => {
+    
+    getPrograms(e.target.dataset.id)
 }
 
-async function getPrograms(){
-    let response = await fetch(`/exercise/add`)
+async function getPrograms(id){
+
+    let response = await fetch(`/exercise/add/${id}`)
     let data = await response.json()
-    console.log(data)
+    
     displayPrograms(data)
     
 }
@@ -56,5 +60,5 @@ async function saveToProgram(exid, id){
         })
     }
     )
-    console.log(`You click on program with id of ${id}`)
+
 }

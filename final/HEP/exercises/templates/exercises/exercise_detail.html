@@ -16,7 +16,7 @@
           {% else %}
           {% endif %}
           <div class="dropdown">
-            <button class="add btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="add btn btn-success dropdown-toggle" data-id="{{object.pk}}"type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Add to Program
             </button>
             <div class="dropdown-menu" data-exercise="{{object.pk}}"aria-labelledby="dropdownMenuButton">

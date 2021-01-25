@@ -1,4 +1,6 @@
 
+// in case user accesses via back button
+
 document.addEventListener('DOMContentLoaded', () => {
     startingExerciseVal = document.querySelector('.libary-input')
     getExercises(startingExerciseVal)
@@ -16,6 +18,7 @@ let libraryInput= document.querySelector('.library-input')
 
 libraryInput.onkeyup = (e) => {
     let {value} = e.target
+    // avoid changes on backspace
     if (e.keyCode === 8){
         return
     }
@@ -68,7 +71,7 @@ async function getExercises(val){
     
     
     data.forEach( (exercise, index) => {
-        console.log(index)
+        
         if (index>= minPage && index <= maxPage){
             cardContainer.innerHTML +=`
             <div id="indy-card" class="card m-4" style="max-width: 18rem;">
