@@ -1,7 +1,52 @@
-body{
-    background-color: aqua;
+/* light = #f9f7f0
+mild = #18B7BE
+medium  = #178CA4
+dark = #072A40 */
+
+*{
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
 }
 
+body{
+    background-color: #18B7BE;
+    color:#f9f7f0
+}
+
+a{
+    color:#072A40;
+    text-transform: uppercase;
+}
+a:hover,
+a:focus{
+    text-decoration: none;
+    color:#1675b1;
+}
+
+/* restyling buttons */
+.btn-main{
+    background-color: #072a40;
+    color:#f9f7f0;
+}
+
+
+.btn-sec{
+    background-color:#072A40;
+    color:#f9f7f0;
+}
+
+/* profile page */
+
+.profile-container{
+    max-width: 80%;
+    background-color:#f9f7f0;
+    display: flex;
+    justify-content: space-between;
+    margin:2em auto 0;
+    padding:1em;
+    border-radius: 5px;
+    color:#072A40;
+}
 .profile-icon{
     font-size: 4rem;
 }
@@ -12,21 +57,97 @@ body{
     object-fit: cover;
 }
 
-.update-profile{
-    display:none
+.user-img{
+    align-self: center;
+}
+.user-info{
+    text-align: center;
+    align-self: center;
 }
 
+.edit-btn-profile{
+    align-self: flex-end;
+}
+
+@media (max-width:800px){
+    .profile-container{
+        flex-direction: column;
+        min-height: 80vh;
+    }
+
+}
+
+@media (max-width:450px){
+    .profile-container{
+        flex-direction: column;
+        justify-content: space-around;
+        min-height: 60vh;
+        min-width:90%;
+        font-size: .8rem;
+    }
+
+}
+/* profile pop-up */
+.update-profile{
+    display:none;
+    margin:1em auto;
+    max-width: 80%;
+    padding:1em;
+    background-color:#f9f7f0;
+    border-radius: 5px;
+    color:#072A40;
+    
+}
+
+@media (max-width:450px){
+    .update-profile{
+        min-height: 50vh;
+        min-width:90%;
+        font-size: .8rem;
+    }
+
+}
+
+.profile-header{
+    display:flex;
+    justify-content: space-between;
+}
+
+#close-profile-button{
+    background: none;
+    border:none;
+}
 /* homepage */
 
 .home-container{
     display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    color:#072A40 ;
+    gap:2em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    background-color:#178CA4;
+    padding:1em;
+    border-radius: 5px;
 }
+
+.main-card{
+    max-width: 24rem;
+}
+
+.body-home{
+    text-align: center;
+}
+
+
+/* pagination */
+
 
 /* cards in library */
 .card-container{
     border-radius: 5px;
-    background-color: rgb(48, 48, 48);
+    color:#072A40;
+    background-color: #178CA4;
     display:grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     margin-bottom: 1em;
@@ -43,30 +164,214 @@ body{
     transform:scale(1.05);
 }
 
+/* programs page */
+
+.program-header{
+    margin:1em auto;
+    display: flex;
+    justify-content: space-between;
+    
+}
+
+@media(max-width:450px){
+    .program-header{
+        flex-direction: column;
+    }
+    .program-header a{
+        margin-bottom: 1em;
+    }
+}
+.program-main-container{
+    margin-top: 1em auto;
+    text-align: center;
+}
+.ex-name{
+    align-self: center;
+}
+
 /* hiding and displaying programs */
 .hide{
     display:none
 }
+
+.program-view{
+    color:#072A40;
+    transition: color .250ms ease-in-out;
+}
+.program-view:hover,
+.program-view:focus{
+    color:#f9f7f0;
+    background-color: #072A40;
+    border:#072A40;
+}
 .program-item{
+    color:#072A40;
     transition: color .250ms ease-in-out;
 }
 
 .program-item:focus,
 .program-item:hover{
-    background-color: rgb(219, 218, 218);
+    background-color: #072A40;
+    color:#f9f7f0;
 }
 
-/* .dropdown{
-    display:none;
-    position: absolute;
-    left:0%;
-    right:0%;
-    top:0%;
-    bottom:0%;
+.list-ex-item{
+    transition: color .250ms ease-in-out;
+}
+.list-ex-item:focus,
+.list-ex-item:hover{
+    background-color: rgb(230, 230, 230);
+}
 
-} */
-
+@media(max-width:450px){
+    
+        .list-ex-item{
+            font-size: .8rem;
+            flex-direction: column;
+        }
+        .list-ex-item > *{
+            margin-top: 1em;
+        }
+    
+    
+}
 .program-container{
     border:1px solid red;
     display:grid
+}
+
+.exerciseToggler{
+    margin-top: 2em;
+    margin-bottom:1em;
+}
+
+/* delete training program page */
+.drop-container{
+    margin: 2em auto;
+    display: flex;
+}
+
+.drop-del{
+    margin: 0 auto;
+}
+
+/* create program page */
+
+.create-program-container{
+    margin:1em auto
+}
+
+/* ex detail */
+
+.ex-detail-card{
+    margin:2em auto;
+    max-width: 18rem;
+    min-height: 50vh;
+    color:#072a40;
+}
+
+/* navbar */
+
+.hepnav{
+    background-color:#f9f7f0;
+    color:#072A40;
+}
+/* btns */
+.button{
+    padding:.75em 1.25em;
+    border:none;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.btn-pri{
+    color:#f9f7f0;
+    background: #072A40;
+    transition: background-color 250ms ease-in-out ;
+}
+
+.btn-outline-pri{
+    background:#f9f7f0;
+    color: #072A40;
+    transition: background-color 250ms ease-in-out ;
+}
+
+.btn-outline-pri:hover,
+.btn-outline-pri:focus{
+    background-color: #0f4b70;
+    color:#f9f7f0;
+    text-decoration: none;
+    border:none;
+}
+
+.btn-pri:hover,
+.btn-pri:focus{
+    background-color: #0f4b70;
+    color:#f9f7f0;
+    text-decoration: none;
+}
+
+.btn-sec{
+    color:#f9f7f0;
+    background: #178CA4;
+    transition: background-color 250ms ease-in-out ;
+}
+
+.btn-sec:hover,
+.btn-sec:focus{
+    background-color: #22b5d3;
+    color:#f9f7f0;
+    text-decoration: none;
+}
+
+/* pagination */
+.pagination > li > a
+{
+    background-color: white;
+    color: #072A40;;
+}
+
+.pagination > li > a:focus,
+.pagination > li > a:hover,
+.pagination > li > span:focus,
+.pagination > li > span:hover
+{
+    color: #f9f7f0;
+    background-color: #072A40;
+    border-color: #072A40;
+}
+
+.pagination > .active > a
+{
+    color: #f9f7f0;
+    background-color: #072A40 !Important;
+    border: solid 1px #072A40 !Important;
+}
+
+.pagination > .active > a:hover
+{
+    background-color: #072A40 !Important;
+    border: solid 1px #072A40;
+}
+
+.page-link{
+    color:#072A40;
+    background-color: #f9f7f0;
+}
+
+.page-link:hover,
+.page-link:focus{
+    color:#072A40;
+}
+
+.btn{
+    text-align: center;
+}
+
+.calendar-head{
+    color:#072A40;
+    text-transform: uppercase;
+    font-weight: 700;
 }

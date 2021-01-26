@@ -110,11 +110,12 @@ class ExerciseStatsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVie
         messages.error(self.request, self.success_message)
         return super(ExerciseStatsDeleteView, self).delete(request, *args, **kwargs)
 
-class ExerciseStatsUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class ExerciseStatsUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
 # Create your views here.
     model= ExerciseStats
     fields = ['sets', 'reps', 'notes', 'time']
     success_url= '/exercise/programs'
+    success_message = "Exercise Successfully Updated."
 
     def form_valid(self, form):
         form.instance.exerciser = self.request.user

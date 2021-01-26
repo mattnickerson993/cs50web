@@ -4,7 +4,7 @@
 
 {% block content %}
     
-    <div class="card ml-auto mr-auto mt-4" style="max-width: 18rem;">
+    <div class="card ex-detail-card">
         <img class="card-img-top" src="{{object.image.url}}" alt="Card image cap">
         <div class="card-body">
           <h5 class="card-title">{{object.title}}</h5>
@@ -28,7 +28,7 @@
             <small class="text-muted align-self-center">{{object.author}}</small>
             <img style="max-height: 50px; max-width: 50px;"class="profile-img rounded-circle img-fluid" src="{{object.author.profile.pic.url}}">
         </div>
-      </div>
+    </div>
       
 
     {% block script%}

@@ -5,28 +5,28 @@
 
 {% block content %}
 
-    <div class="container m-4 d-flex justify-content-between">
-        <a href="{% url 'create_program' %}"class="btn btn-primary">Create A Program</a>
+    <div class="program-header">
+        <a href="{% url 'create_program' %}"class="button btn-pri">Create A Program</a>
         {% if programs %}
-        <a href="{% url 'training_programs_list' %}"class="btn btn-danger">Delete A Program</a>
+        <a href="{% url 'training_programs_list' %}"class="button btn-danger">Delete A Program</a>
         {% else %}
         {% endif %}
     </div>
     {% if programs %}
-    <div class="container text-center">
+    <div class="program-main-container">
         <div class="list-group">
-            <button class="list-group-item btn btn-outline-primary mb-2 program-view">View Programs</button>
+            <button class="list-group-item btn mb-2 program-view">View Programs</button>
         
             {% for program in programs %}
-            <button data-id={{program.id}} class="exerciseToggler list-group-item btn btn-outline-primary mb-2 program-item hide">{{program}}</button>
+            <button data-id={{program.id}} class="exerciseToggler list-group-item btn program-item hide">{{program}}</button>
             {% for content in program.contents.all %}  
-            <div class="exercises{{program.id}} m-4 list-item hide">
+            <div class="exercises{{program.id}} list-item ex-list-item hide">
                 
-                <div class="list-group-item btn btn-outline-secondary d-flex justify-content-around">
-                    <span>{{content.exercise}}</span>
+                <div class="list-group-item btn d-flex justify-content-around list-ex-item">
+                    <span class="ex-name">{{content.exercise}}</span>
                     <span>
-                        <a class="mr-1 btn btn-primary"href="{% url 'exercisestats_update' content.id %}"><i class="far fa-edit"></i></a>
-                        <a class="ml-1 btn btn-danger" href="{% url 'exercisestats_delete' content.id %}"><i class="far fa-trash-alt"></i></a>
+                        <a class="mr-1 btn btn-pri edit-link"href="{% url 'exercisestats_update' content.id %}"><i class="far fa-edit"></i></a>
+                        <a class="ml-1 btn btn-danger del-link" href="{% url 'exercisestats_delete' content.id %}"><i class="far fa-trash-alt"></i></a>
                     </span>
                 </div>
                 

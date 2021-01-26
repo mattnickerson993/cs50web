@@ -4,7 +4,7 @@
 
 {% block content %}
 
-    <div class="container m-4">
+    <div class="create-program-container">
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
@@ -14,8 +14,9 @@
                 <button type="sumbit" class="btn btn-primary">Submit</button>
             </div>
         </form>
-        
     </div>
+        
+    
     
     
     

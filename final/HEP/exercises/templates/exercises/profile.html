@@ -5,30 +5,28 @@
 
 {% block content %}
     <div class="container">
-        <div class="container mt-2 d-flex flex-row bg-light">
-            <div class="user-img align-self-center">
+        <div class="profile-container">
+            <div class="user-img">
                 <img class="profile-img rounded-circle img-fluid" src="{{user.profile.pic.url }}">
             </div>
-            <div class="user-info align-self-center">
+            <div class="user-info">
                 <h3>{{user.username}}</h3>
                 <div>{{user.email}}</div>
             </div>
-            <div class="align-self-end ml-auto">
+            <div class="edit-btn-profile">
                 <button id="edit-btn" class="btn btn-outline-secondary">Edit</button>
             </div>   
         </div>
-        <div class="update-profile container mt-4">
-            <div class="d-flex justify-content-between width:100%">
+        <div class="update-profile">
+            <div class="profile-header">
                 <h3>Profile Info</h3>
                 <button id="close-profile-button">X</button>
             </div>
-            <form method="POST" enctype="multipart/form-data">
+            <form class="profile-form" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="form-group">
                     {{user_form|crispy}}
                     {{profile_form|crispy}}
-                </div>
-                <div class="form-group">
+                <div class="form-group profile-btn ">
                     <button type="sumbit" class="btn btn-primary">Update Profile</button>
                 </div>
             </form>

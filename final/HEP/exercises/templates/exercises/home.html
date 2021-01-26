@@ -2,15 +2,15 @@
 
 
 {% block content %}
-    <div class="container mt-2">
-        <a class="btn btn-primary" href="{% url 'exercise_create' %}">Create New Exercise</a>
+    <div class="mt-2">
+        <a class="button btn-pri" href="{% url 'exercise_create' %}">Create New Exercise</a>
     </div>
     
    <div class="home-container">
     {% for exercise in exercises %}
-        <div class="card m-4" style="max-width: 18rem;">
+        <div class="card main-card">
             <img class="card-img-top" src="{{exercise.image.url}}" alt="Card image cap">
-            <div class="card-body">
+            <div class="card-body body-home">
             <h5 class="card-title"><a href="{% url 'exercise_detail' exercise.pk %}">{{exercise.title}}</a></h5>
             <p class="card-text">{{exercise.description}}</p>
             <p class="card-text"><small class="text-muted">{{exercise.date_posted|date:" F d, Y"}}</small></p>
@@ -21,35 +21,34 @@
             </div>
         </div>
     {% endfor %}
+    
    </div>
+   <nav class="pagination" aria-label="Page navigation">
+    <ul class="step-links pagination">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{page_obj.previous_page_number }}">previous</a></li>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active"><a class="page-link" href="?page={{num}}">{{num}}</a></li>
+            {% elif num > page_obj.number|add:'-3' and page_obj.number|add:'3' > num %}
+                <li class="page-item"><a class="page-link" href="?page={{num}}">{{num}}</a></li>
+           
 
-   
+            {% endif %}
+            
+
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{page_obj.next_page_number}}">next</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{page_obj.paginator.num_pages}}">last &raquo;</a></li>
+        {% endif %}
+    </ul> 
+
+</nav>
 
     
-    <nav class="pagination" aria-label="Page navigation">
-        <ul class="step-links pagination">
-            {% if page_obj.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{page_obj.previous_page_number }}">previous</a></li>
-            {% endif %}
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <li class="page-item active"><a class="page-link" href="?page={{num}}">{{num}}</a></li>
-                {% elif num > page_obj.number|add:'-3' and page_obj.number|add:'3' > num %}
-                    <li class="page-item"><a class="page-link" href="?page={{num}}">{{num}}</a></li>
-               
-
-                {% endif %}
-                
-
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{page_obj.next_page_number}}">next</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{page_obj.paginator.num_pages}}">last &raquo;</a></li>
-            {% endif %}
-        </ul> 
-
-    </nav>
 
 {% endblock content %}
