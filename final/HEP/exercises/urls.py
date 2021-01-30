@@ -24,6 +24,7 @@ urlpatterns = [
     path('exercise/programs/create', ProgramCreateView.as_view(), name="create_program"),
     path('exercise/exercisestats/delete/<int:pk>/', ExerciseStatsDeleteView.as_view(), name="exercisestats_delete"),
     path('exercise/exercisestats/update/<int:pk>/', ExerciseStatsUpdateView.as_view(), name="exercisestats_update"),
+    path('myHEP', views.myHEP, name="myHEP"),
 
 
     #API ROUTES

@@ -250,3 +250,6 @@ def programs(request):
 
     return render(request, "exercises/programs.html", 
     {'programs': programs} )
+
+def myHEP(request):
+    return render(request, "exercises/myHEP.html")
